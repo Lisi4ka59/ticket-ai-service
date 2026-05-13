@@ -1,0 +1,64 @@
+services:
+  model-downloader:
+    image: curlimages/curl:8.11.1
+    volumes:
+      - ./models:/models
+    environment:
+      MODEL_URL: https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q4_K_M.gguf
+      MODEL_PATH: /models/Qwen3-0.6B-Q4_K_M.gguf
+    command:
+      - sh
+      - -c
+      - |
+        set -eu
+        mkdir -p "$$(dirname "$$MODEL_PATH")"
+        if [ -s "$$MODEL_PATH" ]; then
+          echo "Model already exists at $$MODEL_PATH"
+          exit 0
+        fi
+        tmp_file="$$MODEL_PATH.tmp"
+        rm -f "$$tmp_file"
+        echo "Downloading $$MODEL_URL to $$MODEL_PATH"
+        curl -fL --retry 5 --retry-delay 5 --connect-timeout 30 -o "$$tmp_file" "$$MODEL_URL"
+        mv "$$tmp_file" "$$MODEL_PATH"
+        echo "Model downloaded to $$MODEL_PATH"
+
+  ticket-ai-service:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # Inside docker-compose, the app reaches llama.cpp by service name.
+      LLM_PROVIDER: llama.cpp
+      LLM_API_KEY: ""
+      LLM_BASE_URL: http://llama-cpp:8080/v1
+      LLM_MODEL: Qwen3-0.6B-Q4_K_M.gguf
+      LLM_TIMEOUT_SECONDS: "120"
+      LLM_MAX_RETRIES: "1"
+      LLM_TEMPERATURE: "0.1"
+      LLM_MAX_TOKENS: "900"
+    depends_on:
+      llama-cpp:
+        condition: service_started
+
+  llama-cpp:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./models:/models:ro
+    depends_on:
+      model-downloader:
+        condition: service_completed_successfully
+    command:
+      - "-m"
+      - "/models/Qwen3-0.6B-Q4_K_M.gguf"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "8080"
+      - "--ctx-size"
+      - "8192"
+      - "--jinja"
