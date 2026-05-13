@@ -40,10 +40,16 @@ models/
 mkdir -p models
 ```
 
-Скачайте файл `Qwen3-0.6B-Q4_K_M.gguf` со страницы Hugging Face `Qwen/Qwen3-0.6B-GGUF` и положите его сюда:
+Скачайте файл `Qwen3-0.6B-Q4_K_M.gguf` со страницы Hugging Face `lmstudio-community/Qwen3-0.6B-GGUF` и положите его сюда:
 
 ```text
 models/Qwen3-0.6B-Q4_K_M.gguf
+```
+
+Прямая ссылка на файл модели:
+
+```text
+https://huggingface.co/lmstudio-community/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q4_K_M.gguf?download=true
 ```
 
 ## Локальный запуск без Docker
@@ -265,7 +271,7 @@ pytest -q
 Самостоятельно приняты решения:
 
 - использовать локальный `llama.cpp server` для локального запуска модели;
-- использовать `Qwen3-0.6B-GGUF Q4_K_M` как легкую локальную модель для прототипа;
+- использовать `lmstudio-community/Qwen3-0.6B-GGUF Q4_K_M` как легкую локальную модель для прототипа;
 - оставить `LLM_API_KEY` опциональным для совместимости с защищенным локальным endpoint;
 - использовать `/no_think`, чтобы снизить риск вывода reasoning перед JSON;
 - очищать `<think>...</think>` и markdown code fence перед JSON-парсингом;

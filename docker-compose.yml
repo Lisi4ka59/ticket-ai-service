@@ -4,7 +4,7 @@ services:
     volumes:
       - ./models:/models
     environment:
-      MODEL_URL: https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q4_K_M.gguf
+      MODEL_URL: "https://huggingface.co/lmstudio-community/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q4_K_M.gguf?download=true"
       MODEL_PATH: /models/Qwen3-0.6B-Q4_K_M.gguf
     command:
       - sh
